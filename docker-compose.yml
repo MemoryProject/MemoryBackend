@@ -6,7 +6,7 @@ services:
       - ./database:/var/lib/postgresql/data
     restart: always
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: memoryBackend
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
     ports:

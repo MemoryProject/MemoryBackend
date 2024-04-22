@@ -11,11 +11,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class CardsController extends AbstractController
 {
     #[Route('/api/cards', name: 'getCards', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les cartes.')]
     public function getCards(CardsRepository $cardsRepository, SerializerInterface $serializer): JsonResponse
     {
         $cards = $cardsRepository->findAll();
@@ -25,6 +27,7 @@ class CardsController extends AbstractController
     }
 
     #[Route('/api/cards/{id}', name: 'getCardById', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les cartes par id.')]
     public function getCardById(int $id, CardsRepository $cardsRepository, SerializerInterface $serializer): JsonResponse
     {
         $card = $cardsRepository->find($id);
@@ -39,6 +42,7 @@ class CardsController extends AbstractController
     }
 
     #[Route('/api/cards', name:"createCard", methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour créer une carte.')]
     public function createCard(Request $request, SerializerInterface $serializer, ThemesRepository $themesRepository, EntityManagerInterface $em): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -65,6 +69,7 @@ class CardsController extends AbstractController
         return new JsonResponse($jsonCard, Response::HTTP_CREATED, [], true);
     }
     #[Route('/api/cards/{id}', name:"updateCard", methods:['PUT'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour modifier une carte.')]
     public function updateCard(int $id, Request $request, SerializerInterface $serializer, ThemesRepository $themesRepository, CardsRepository $cardsRepository, EntityManagerInterface $em): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -95,6 +100,7 @@ class CardsController extends AbstractController
     }
 
     #[Route('/api/cards/{id}', name: 'deleteCard', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour supprimer une carte.')]
     public function deleteCard(Cards $card, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($card);

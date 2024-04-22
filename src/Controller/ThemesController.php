@@ -11,12 +11,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ThemesController extends AbstractController
 {
     #[Route('/api/themes', name: 'getThemes', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les themes.')]
     public function getThemes(SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         // Récupérer le repository des thèmes
@@ -33,6 +35,7 @@ class ThemesController extends AbstractController
     }
 
     #[Route('/api/themes/{id}', name: 'getThemeById', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les themes par id.')]
     public function getThemeById(int $id, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
         $themesRepository = $em->getRepository(Themes::class);
@@ -48,6 +51,7 @@ class ThemesController extends AbstractController
     }
 
     #[Route('/api/themes', name:"createTheme", methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour créer un theme.')]
     public function createTheme(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator): JsonResponse
     {
         // Désérialiser la requête en une entité Themes
@@ -65,6 +69,7 @@ class ThemesController extends AbstractController
     }
 
     #[Route('/api/themes/{id}', name:"updateTheme", methods:['PUT'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour modifier un theme.')]
     public function updateTheme(Request $request, SerializerInterface $serializer, Themes $currentTheme, EntityManagerInterface $em): JsonResponse
     {
         // Désérialiser la requête en une entité Themes
@@ -82,6 +87,7 @@ class ThemesController extends AbstractController
     }
 
     #[Route('/api/themes/{id}', name: 'deleteTheme', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour supprimer un theme.')]
     public function deleteTheme(Themes $theme, EntityManagerInterface $em): JsonResponse
     {
         // Récupérer le repository des cartes

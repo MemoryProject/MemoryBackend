@@ -10,11 +10,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class GameSettingsController extends AbstractController
 {
     #[Route('/api/gameSettings', name: 'getGameSettings', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les paramètres du jeu.')]
     public function getGameSettings(GameSettingsRepository $gameSettingsRepository, SerializerInterface $serializer): JsonResponse
     {
         $gameSettings = $gameSettingsRepository->findAll();
@@ -24,6 +26,7 @@ class GameSettingsController extends AbstractController
     }
 
     #[Route('/api/gameSettings/{id}', name: 'getGameSettingById', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les paramètres du jeu par id.')]
     public function getGameSettingById(int $id, GameSettingsRepository $gameSettingsRepository, SerializerInterface $serializer): JsonResponse
     {
         $gameSetting = $gameSettingsRepository->find($id);
@@ -38,6 +41,7 @@ class GameSettingsController extends AbstractController
     }
 
     #[Route('/api/gameSettings', name:"createGameSettings", methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour créer un paramètre du jeu.')]
     public function createGameSettings(Request $request, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         $gameSettings = $serializer->deserialize($request->getContent(), GameSettings::class, 'json');
@@ -49,6 +53,7 @@ class GameSettingsController extends AbstractController
     }
 
     #[Route('/api/gameSettings/{id}', name:"updateGameSettings", methods:['PUT'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour modifier un paramètre du jeu.')]
     public function updateGameSettings(Request $request, SerializerInterface $serializer, GameSettings $currentGameSettings, EntityManagerInterface $em): JsonResponse
     {
         $updatedGameSettings = $serializer->deserialize($request->getContent(), GameSettings::class, 'json', ['object_to_populate' => $currentGameSettings]);
@@ -59,6 +64,7 @@ class GameSettingsController extends AbstractController
     }
 
     #[Route('/api/gameSettings/{id}', name: 'deleteGameSettings', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour supprimer un paramètre du jeu.')]
     public function deleteGameSettings(GameSettings $gameSettings, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($gameSettings);

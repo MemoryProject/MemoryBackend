@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CardsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CardsRepository::class)]
 class Cards
@@ -14,6 +15,7 @@ class Cards
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(max: 255, maxMessage: "L'url de l'image ne peut pas faire plus de {{ limit }} caractères")]
     private ?string $image_url = null;
 
     #[ORM\ManyToOne]

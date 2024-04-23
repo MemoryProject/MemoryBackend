@@ -12,17 +12,26 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class GameSettingsController extends AbstractController
 {
     #[Route('/api/gameSettings', name: 'getGameSettings', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les paramètres du jeu.')]
-    public function getGameSettings(GameSettingsRepository $gameSettingsRepository, SerializerInterface $serializer, Request $request): JsonResponse
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les paramètres de jeu.')]
+    public function getAllGameSettings(GameSettingsRepository $gameSettingsRepository, SerializerInterface $serializer, Request $request, TagAwareCacheInterface $cache): JsonResponse
     {
         $page = $request->query->get('page', 1);
         $limit = $request->query->get('limit', 3);
 
-        $gameSettings = $gameSettingsRepository->findAllWithPagination($page, $limit);
+        $cacheKey = 'getAllGameSettings-' . $page . '-' . $limit;
+
+        $gameSettings = $cache->get($cacheKey, function (ItemInterface $item) use ($gameSettingsRepository, $page, $limit) {
+            $item->expiresAfter(3600);
+            $item->tag(['gameSettingsCache']);
+            return $gameSettingsRepository->findAllWithPagination($page, $limit);
+        });
+
         $jsonGameSettings = $serializer->serialize($gameSettings, 'json');
 
         return new JsonResponse($jsonGameSettings, Response::HTTP_OK, [], true);

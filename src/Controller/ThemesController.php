@@ -15,26 +15,30 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class ThemesController extends AbstractController
 {
     #[Route('/api/themes', name: 'getThemes', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les thèmes.')]
-    public function getThemes(ThemesRepository $themesRepository, SerializerInterface $serializer, Request $request): JsonResponse
+    public function getAllThemes(ThemesRepository $themesRepository, SerializerInterface $serializer, Request $request, TagAwareCacheInterface $cache): JsonResponse
     {
         $page = $request->query->get('page', 1);
         $limit = $request->query->get('limit', 3);
 
-        // Récupérer tous les thèmes
-        $themes = $themesRepository->findAllWithPagination($page, $limit);
+        $cacheKey = 'getAllThemes-' . $page . '-' . $limit;
 
-        // Sérialiser les thèmes en JSON
+        $themes = $cache->get($cacheKey, function (ItemInterface $item) use ($themesRepository, $page, $limit) {
+            $item->expiresAfter(3600);
+            $item->tag(['themesCache']);
+            return $themesRepository->findAllWithPagination($page, $limit);
+        });
+
         $jsonThemes = $serializer->serialize($themes, 'json');
 
-        // Retourner une réponse JSON avec les thèmes
         return new JsonResponse($jsonThemes, Response::HTTP_OK, [], true);
     }
-
     #[Route('/api/themes/{id}', name: 'getThemeById', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les themes par id.')]
     public function getThemeById(int $id, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse

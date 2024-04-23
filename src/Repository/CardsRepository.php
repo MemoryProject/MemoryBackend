@@ -21,6 +21,16 @@ class CardsRepository extends ServiceEntityRepository
         parent::__construct($registry, Cards::class);
     }
 
+    public function findAllWithPagination($page = 1, $limit = 3)
+    {
+        $query = $this->createQueryBuilder('c')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery();
+
+        return $query->getResult();
+    }
+
     //    /**
     //     * @return Cards[] Returns an array of Cards objects
     //     */

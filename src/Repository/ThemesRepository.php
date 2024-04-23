@@ -21,6 +21,16 @@ class ThemesRepository extends ServiceEntityRepository
         parent::__construct($registry, Themes::class);
     }
 
+    public function findAllWithPagination($page = 1, $limit = 3)
+    {
+        $query = $this->createQueryBuilder('t')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery();
+
+        return $query->getResult();
+    }
+
     //    /**
     //     * @return Themes[] Returns an array of Themes objects
     //     */

@@ -13,14 +13,26 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class CardsController extends AbstractController
 {
-    #[Route('/api/cards', name: 'getCards', methods: ['GET'])]
+    #[Route('/api/cards', name: 'cards', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les cartes.')]
-    public function getCards(CardsRepository $cardsRepository, SerializerInterface $serializer): JsonResponse
+    public function getAllCards(CardsRepository $cardsRepository, SerializerInterface $serializer, Request $request, TagAwareCacheInterface $cache): JsonResponse
     {
-        $cards = $cardsRepository->findAll();
+        $page = $request->query->get('page', 1);
+        $limit = $request->query->get('limit', 3);
+
+        $cacheKey = 'getAllCards-' . $page . '-' . $limit;
+
+        $cards = $cache->get($cacheKey, function (ItemInterface $item) use ($cardsRepository, $page, $limit) {
+            $item->expiresAfter(3600);
+            $item->tag(['cardsCache']);
+            return $cardsRepository->findAllWithPagination($page, $limit);
+        });
+
         $jsonCards = $serializer->serialize($cards, 'json');
 
         return new JsonResponse($jsonCards, Response::HTTP_OK, [], true);

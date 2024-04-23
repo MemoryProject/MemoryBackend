@@ -17,9 +17,12 @@ class GameSettingsController extends AbstractController
 {
     #[Route('/api/gameSettings', name: 'getGameSettings', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les paramètres du jeu.')]
-    public function getGameSettings(GameSettingsRepository $gameSettingsRepository, SerializerInterface $serializer): JsonResponse
+    public function getGameSettings(GameSettingsRepository $gameSettingsRepository, SerializerInterface $serializer, Request $request): JsonResponse
     {
-        $gameSettings = $gameSettingsRepository->findAll();
+        $page = $request->query->get('page', 1);
+        $limit = $request->query->get('limit', 3);
+
+        $gameSettings = $gameSettingsRepository->findAllWithPagination($page, $limit);
         $jsonGameSettings = $serializer->serialize($gameSettings, 'json');
 
         return new JsonResponse($jsonGameSettings, Response::HTTP_OK, [], true);

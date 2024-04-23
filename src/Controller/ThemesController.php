@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Cards;
 use App\Entity\Themes;
+use App\Repository\ThemesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,14 +19,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ThemesController extends AbstractController
 {
     #[Route('/api/themes', name: 'getThemes', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les themes.')]
-    public function getThemes(SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les thèmes.')]
+    public function getThemes(ThemesRepository $themesRepository, SerializerInterface $serializer, Request $request): JsonResponse
     {
-        // Récupérer le repository des thèmes
-        $themesRepository = $em->getRepository(Themes::class);
+        $page = $request->query->get('page', 1);
+        $limit = $request->query->get('limit', 3);
 
         // Récupérer tous les thèmes
-        $themes = $themesRepository->findAll();
+        $themes = $themesRepository->findAllWithPagination($page, $limit);
 
         // Sérialiser les thèmes en JSON
         $jsonThemes = $serializer->serialize($themes, 'json');

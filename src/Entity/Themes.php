@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ThemesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ThemesRepository::class)]
@@ -12,6 +13,7 @@ class Themes
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups("getCards")]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]

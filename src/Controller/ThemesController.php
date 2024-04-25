@@ -14,7 +14,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
+use JMS\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -74,21 +75,28 @@ class ThemesController extends AbstractController
     }
 
     #[Route('/api/themes/{id}', name:"updateTheme", methods:['PUT'])]
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour modifier un theme.')]
-    public function updateTheme(Request $request, SerializerInterface $serializer, Themes $currentTheme, EntityManagerInterface $em): JsonResponse
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour éditer un thème')]
+    public function updateTheme(Request $request, SerializerInterface $serializer, Themes $currentTheme, EntityManagerInterface $em, ValidatorInterface $validator, TagAwareCacheInterface $cache): JsonResponse
     {
-        // Désérialiser la requête en une entité Themes
-        $updatedTheme = $serializer->deserialize($request->getContent(),
-            Themes::class,
-            'json',
-            [AbstractNormalizer::OBJECT_TO_POPULATE => $currentTheme]);
+        $newTheme = $serializer->deserialize($request->getContent(), Themes::class, 'json');
 
-        // Persistez l'entité dans la base de données
-        $em->persist($updatedTheme);
+        // Copy the fields from newTheme to currentTheme
+        $currentTheme->setName($newTheme->getName());
+
+        // Validate the currentTheme
+        $errors = $validator->validate($currentTheme);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
+
+        // Persist and flush the currentTheme
+        $em->persist($currentTheme);
         $em->flush();
 
-        // Retourner une réponse JSON avec le code HTTP 204 (No Content)
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        // Invalidate the cache
+        $cache->invalidateTags(["themesCache"]);
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
     #[Route('/api/themes/{id}', name: 'deleteTheme', methods: ['DELETE'])]

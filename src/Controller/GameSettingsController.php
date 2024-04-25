@@ -11,7 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\SerializerInterface;
+use JMS\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -65,14 +66,28 @@ class GameSettingsController extends AbstractController
     }
 
     #[Route('/api/gameSettings/{id}', name:"updateGameSettings", methods:['PUT'])]
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour modifier un paramètre du jeu.')]
-    public function updateGameSettings(Request $request, SerializerInterface $serializer, GameSettings $currentGameSettings, EntityManagerInterface $em): JsonResponse
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour éditer les paramètres de jeu')]
+    public function updateGameSettings(Request $request, SerializerInterface $serializer, GameSettings $currentGameSettings, EntityManagerInterface $em, ValidatorInterface $validator, TagAwareCacheInterface $cache): JsonResponse
     {
-        $updatedGameSettings = $serializer->deserialize($request->getContent(), GameSettings::class, 'json', ['object_to_populate' => $currentGameSettings]);
-        $em->persist($updatedGameSettings);
+        $newGameSettings = $serializer->deserialize($request->getContent(), GameSettings::class, 'json');
+
+        // Copy the fields from newGameSettings to currentGameSettings
+        $currentGameSettings->setDifficulty($newGameSettings->getDifficulty());
+
+        // Validate the currentGameSettings
+        $errors = $validator->validate($currentGameSettings);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
+
+        // Persist and flush the currentGameSettings
+        $em->persist($currentGameSettings);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        // Invalidate the cache
+        $cache->invalidateTags(["gameSettingsCache"]);
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
     #[Route('/api/gameSettings/{id}', name: 'deleteGameSettings', methods: ['DELETE'])]

@@ -3,16 +3,20 @@
 namespace App\Controller;
 
 use App\Entity\Cards;
+use App\Entity\Themes;
 use App\Repository\CardsRepository;
 use App\Repository\ThemesRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Hateoas\HateoasBuilder;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\SerializerInterface;
+use JMS\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -80,38 +84,48 @@ class CardsController extends AbstractController
 
         return new JsonResponse($jsonCard, Response::HTTP_CREATED, [], true);
     }
+
     #[Route('/api/cards/{id}', name:"updateCard", methods:['PUT'])]
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour modifier une carte.')]
-    public function updateCard(int $id, Request $request, SerializerInterface $serializer, ThemesRepository $themesRepository, CardsRepository $cardsRepository, EntityManagerInterface $em): JsonResponse
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour éditer une carte')]
+    public function updateCard(Request $request, SerializerInterface $serializer, Cards $currentCard, EntityManagerInterface $em, ThemesRepository $themesRepository, ValidatorInterface $validator, TagAwareCacheInterface $cache): JsonResponse
     {
-        $requestData = json_decode($request->getContent(), true);
+        $newCard = $serializer->deserialize($request->getContent(), Cards::class, 'json');
 
-        if (!isset($requestData['themeId']['id'])) {
-            return new JsonResponse(['error' => 'Theme ID is required'], Response::HTTP_BAD_REQUEST);
-        }
+        // Copy the fields from newCard to currentCard
+        $currentCard->setImageUrl($newCard->getImageUrl());
 
-        $theme = $themesRepository->find($requestData['themeId']['id']);
+        // Get the themeId from the request content
+        $content = $request->toArray();
+        $themeId = $content['theme_id']['id'] ?? -1;
 
+        // Find the theme
+        $theme = $themesRepository->find($themeId);
+
+        // If the theme does not exist, return an error
         if ($theme === null) {
-            return new JsonResponse(['error' => 'Theme not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => 'Theme not found'], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        $card = $cardsRepository->find($id);
+        // Set the theme of the currentCard
+        $currentCard->setThemeId($theme);
 
-        if ($card === null) {
-            return new JsonResponse(['error' => 'Card not found'], Response::HTTP_NOT_FOUND);
+        // Validate the currentCard
+        $errors = $validator->validate($currentCard);
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
 
-        $card->setImageUrl($requestData['imageUrl']);
-        $card->setThemeId($theme);
-
-        $em->persist($card);
+        // Persist and flush the currentCard
+        $em->persist($currentCard);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        // Invalidate the cache
+        $cache->invalidateTags(["cardsCache"]);
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
-    #[Route('/api/cards/{id}', name: 'deleteCard', methods: ['DELETE'])]
+    #[Route('/api/cards/{id}/d', name: 'deleteCard', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour supprimer une carte.')]
     public function deleteCard(Cards $card, EntityManagerInterface $em): JsonResponse
     {

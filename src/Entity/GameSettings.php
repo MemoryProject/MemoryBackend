@@ -5,7 +5,31 @@ namespace App\Entity;
 use App\Repository\GameSettingsRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
 
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "getGameSettingById",
+ *          parameters = { "id" = "expr(object.getId())" }
+ *      )
+ * )
+ * @Hateoas\Relation(
+ *      "update",
+ *      href = @Hateoas\Route(
+ *          "updateGameSettings",
+ *          parameters = { "id" = "expr(object.getId())" }
+ *      )
+ * )
+ * @Hateoas\Relation(
+ *      "delete",
+ *      href = @Hateoas\Route(
+ *          "deleteGameSettings",
+ *          parameters = { "id" = "expr(object.getId())" }
+ *      )
+ * )
+ */
 #[ORM\Entity(repositoryClass: GameSettingsRepository::class)]
 class GameSettings
 {

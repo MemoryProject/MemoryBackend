@@ -3,11 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Cards;
-use App\Entity\Themes;
 use App\Repository\CardsRepository;
 use App\Repository\ThemesRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Hateoas\HateoasBuilder;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,15 +17,40 @@ use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Attributes as OA;
 
 class CardsController extends AbstractController
 {
     #[Route('/api/cards', name: 'cards', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les cartes.')]
+    #[OA\Response(
+        response: 200,
+        description: "Returns the list of cards",
+        content: new OA\JsonContent(
+            type: "array",
+            items: new OA\Items(ref: new Model(type: Cards::class))
+        )
+    )]
+    #[OA\Parameter(
+        name: "page",
+        in: "query",
+        description: "The page number",
+        schema : new OA\Schema(type: "int")
+    )]
+    #[OA\Parameter (
+        name: "limit",
+        in: "query",
+        description: "The number of items per page",
+        schema: new OA\Schema(type: "int")
+    )]
+    #[OA\Tag(name: "Cards")]
+    #[OA\SecurityRequirement(name: "bearerAuth")]
     public function getAllCards(CardsRepository $cardsRepository, SerializerInterface $serializer, Request $request, TagAwareCacheInterface $cache): JsonResponse
     {
-        $page = $request->query->get('page', 1);
-        $limit = $request->query->get('limit', 3);
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 3);
 
         $cacheKey = 'getAllCards-' . $page . '-' . $limit;
 

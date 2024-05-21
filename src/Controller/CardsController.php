@@ -190,7 +190,7 @@ class CardsController extends AbstractController
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
-    #[Route('/api/cards/{id}/d', name: 'deleteCard', methods: ['DELETE'])]
+    #[Route('/api/cards/{id}', name: 'deleteCard', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour supprimer une carte.')]
     #[OA\Response(
         response: 204,

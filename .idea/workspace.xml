@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c2e89660-a491-40da-b6e4-6c76f758e30f" name="Changes" comment="Interrogation de l'api externe">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/global/pg_control" beforeDir="false" afterPath="$PROJECT_DIR$/database/global/pg_control" afterDir="false" />
+    <list default="true" id="c2e89660-a491-40da-b6e4-6c76f758e30f" name="Changes" comment="Annotation nelmio sur deleteTheme">
       <change beforePath="$PROJECT_DIR$/database/pg_wal/000000010000000000000001" beforeDir="false" afterPath="$PROJECT_DIR$/database/pg_wal/000000010000000000000001" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/postmaster.pid" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -184,6 +181,7 @@
       <workItem from="1715092052196" duration="3789000" />
       <workItem from="1715096677320" duration="65000" />
       <workItem from="1716247906686" duration="3470000" />
+      <workItem from="1716277802569" duration="292000" />
     </task>
     <task id="LOCAL-00001" summary="init project and database">
       <option name="closed" value="true" />
@@ -305,7 +303,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716250885771</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Annotation nelmio sur deleteTheme">
+      <option name="closed" value="true" />
+      <created>1716278090406</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1716278090406</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -337,6 +343,7 @@
     <MESSAGE value="Ajout de Nelmio (Attribute)" />
     <MESSAGE value="Ajout d'annotation a la doc de l'api" />
     <MESSAGE value="Interrogation de l'api externe" />
-    <option name="LAST_COMMIT_MESSAGE" value="Interrogation de l'api externe" />
+    <MESSAGE value="Annotation nelmio sur deleteTheme" />
+    <option name="LAST_COMMIT_MESSAGE" value="Annotation nelmio sur deleteTheme" />
   </component>
 </project>

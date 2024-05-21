@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c2e89660-a491-40da-b6e4-6c76f758e30f" name="Changes" comment="Ajout de Nelmio (Attribute)" />
+    <list default="true" id="c2e89660-a491-40da-b6e4-6c76f758e30f" name="Changes" comment="Ajout de Nelmio (Attribute)">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/base/16443/pg_internal.init" beforeDir="false" afterPath="$PROJECT_DIR$/database/base/16443/pg_internal.init" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/base/5/pg_internal.init" beforeDir="false" afterPath="$PROJECT_DIR$/database/base/5/pg_internal.init" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/global/pg_control" beforeDir="false" afterPath="$PROJECT_DIR$/database/global/pg_control" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/global/pg_internal.init" beforeDir="false" afterPath="$PROJECT_DIR$/database/global/pg_internal.init" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/pg_stat/pgstat.stat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/pg_wal/000000010000000000000001" beforeDir="false" afterPath="$PROJECT_DIR$/database/pg_wal/000000010000000000000001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/CardsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/CardsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/GameSettingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/GameSettingsController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -175,6 +185,8 @@
       <workItem from="1714569011833" duration="1100000" />
       <workItem from="1715065684030" duration="4974000" />
       <workItem from="1715092052196" duration="3789000" />
+      <workItem from="1715096677320" duration="65000" />
+      <workItem from="1716247906686" duration="1663000" />
     </task>
     <task id="LOCAL-00001" summary="init project and database">
       <option name="closed" value="true" />
@@ -256,7 +268,31 @@
       <option name="project" value="LOCAL" />
       <updated>1715095907624</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Ajout de Nelmio (Attribute)">
+      <option name="closed" value="true" />
+      <created>1715096701596</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1715096701596</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Ajout de Nelmio (Attribute)">
+      <option name="closed" value="true" />
+      <created>1715096715238</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1715096715238</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Ajout de Nelmio (Attribute)">
+      <option name="closed" value="true" />
+      <created>1715096735296</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1715096735296</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -264,6 +300,17 @@
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init project and database" />

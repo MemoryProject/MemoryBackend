@@ -27,7 +27,7 @@ class CardsController extends AbstractController
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les cartes.')]
     #[OA\Response(
         response: 200,
-        description: "Returns the list of cards",
+        description: "Retourne la liste des cartes",
         content: new OA\JsonContent(
             type: "array",
             items: new OA\Items(ref: new Model(type: Cards::class))
@@ -36,13 +36,13 @@ class CardsController extends AbstractController
     #[OA\Parameter(
         name: "page",
         in: "query",
-        description: "The page number",
+        description: "Le numéro de la page à afficher",
         schema : new OA\Schema(type: "int")
     )]
     #[OA\Parameter (
         name: "limit",
         in: "query",
-        description: "The number of items per page",
+        description: "Le nombre de cartes par page",
         schema: new OA\Schema(type: "int")
     )]
     #[OA\Tag(name: "Cards")]
@@ -67,6 +67,16 @@ class CardsController extends AbstractController
 
     #[Route('/api/cards/{id}', name: 'getCardById', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour voir les cartes par id.')]
+    #[OA\Response(
+        response: 200,
+        description: "Retourne la liste des cartes",
+        content: new OA\JsonContent(
+            type: "array",
+            items: new OA\Items(ref: new Model(type: Cards::class))
+        )
+    )]
+    #[OA\Tag(name: "Cards")]
+    #[OA\SecurityRequirement(name: "bearerAuth")]
     public function getCardById(int $id, CardsRepository $cardsRepository, SerializerInterface $serializer): JsonResponse
     {
         $card = $cardsRepository->find($id);
@@ -82,6 +92,24 @@ class CardsController extends AbstractController
 
     #[Route('/api/cards', name:"createCard", methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour créer une carte.')]
+    #[OA\Response(
+        response: 200,
+        description: "Créer une carte par id",
+        content: new OA\JsonContent(
+            type: "array",
+            items: new OA\Items(ref: new Model(type: Cards::class))
+        )
+    )]
+    #[OA\RequestBody(
+        description: "Les données à créer",
+        required: true,
+        content: new OA\JsonContent(
+            type: "array",
+            items: new OA\Items(ref: new Model(type: Cards::class))
+        )
+    )]
+    #[OA\Tag(name: "Cards")]
+    #[OA\SecurityRequirement(name: "bearerAuth")]
     public function createCard(Request $request, SerializerInterface $serializer, ThemesRepository $themesRepository, EntityManagerInterface $em): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -110,6 +138,20 @@ class CardsController extends AbstractController
 
     #[Route('/api/cards/{id}', name:"updateCard", methods:['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour éditer une carte')]
+    #[OA\Response(
+        response: 204,
+        description: "Mettre à jour une carte par id"
+    )]
+    #[OA\RequestBody(
+        description: "Les données à mettre à jour",
+        required: true,
+        content: new OA\JsonContent(
+            type: "array",
+            items: new OA\Items(ref: new Model(type: Cards::class))
+        )
+    )]
+    #[OA\Tag(name: "Cards")]
+    #[OA\SecurityRequirement(name: "bearerAuth")]
     public function updateCard(Request $request, SerializerInterface $serializer, Cards $currentCard, EntityManagerInterface $em, ThemesRepository $themesRepository, ValidatorInterface $validator, TagAwareCacheInterface $cache): JsonResponse
     {
         $newCard = $serializer->deserialize($request->getContent(), Cards::class, 'json');
@@ -150,6 +192,12 @@ class CardsController extends AbstractController
 
     #[Route('/api/cards/{id}/d', name: 'deleteCard', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour supprimer une carte.')]
+    #[OA\Response(
+        response: 204,
+        description: "Supprimer une carte par id"
+    )]
+    #[OA\Tag(name: "Cards")]
+    #[OA\SecurityRequirement(name: "bearerAuth")]
     public function deleteCard(Cards $card, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($card);

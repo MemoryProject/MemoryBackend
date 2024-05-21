@@ -177,6 +177,7 @@ class ThemesController extends AbstractController
         description: "Supprime un thème par id"
     )]
     #[OA\Tag(name: "Themes")]
+    #[OA\SecurityRequirement(name: "bearerAuth")]
     public function deleteTheme(Themes $theme, EntityManagerInterface $em): JsonResponse
     {
         // Récupérer le repository des cartes

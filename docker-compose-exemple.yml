@@ -1,0 +1,22 @@
+version: "3"
+services:
+  db:  # Mettez 'db' au lieu de 'database'
+    container_name: APIMemory
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      MYSQL_DATABASE: API_Memory
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 9090:9090
+
+volumes:
+  dbdata:

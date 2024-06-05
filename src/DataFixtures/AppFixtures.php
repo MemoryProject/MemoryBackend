@@ -33,6 +33,7 @@ class AppFixtures extends Fixture
         $userAdmin->setPassword($this->userPasswordHasher->hashPassword($userAdmin, "password"));
         $manager->persist($userAdmin);
 
+        /*
         //Création de thèmes
         $themes = ['Mario', 'Zelda', 'Final Fantasy', 'Halo', 'Call of Duty', 'The Witcher', 'Cyberpunk 2077', 'Minecraft', 'Fortnite', 'Among Us'];
 
@@ -64,6 +65,7 @@ class AppFixtures extends Fixture
                 $manager->persist($card);
             }
         }
+        */
 
         $manager->flush();
     }
